@@ -1,0 +1,43 @@
+@name WoT HP System E2 By Naki
+@inputs [EngineEnt FuelEnt GunEnt AmmoBoxEnt]:entity
+@inputs [WR1 WR2 WR3 WR4 WR5 WR6 WR7 WR8 WR9 WR10 WL1 WL2 WL3 WL4 WL5 WL6 WL7 WL8 WL9 WL10]:entity
+@outputs HP MaxHP
+@persist HP MaxHP [TrackRightOriginal TrackLeftOriginal]:array TrackRightBroken TrackLeftBroken TracksBroken
+@persist TracksHP
+@trigger 
+
+if(first()|dupefinished()){
+    
+    #[ -- ] Settings [ -- ]#
+    
+    MaxHP=1300
+    
+    TracksHP=MaxHP/10
+    
+    #[ -- ] Settings ends here [ -- ]#
+    
+    TrackRightOriginal=array(WR1,WR2,WR3,WR4,WR5,WR6,WR7,WR8,WR9,WR10)
+    TrackLeftOriginal=array(WL1,WL2,WL3,WL4,WL5,WL6,WL7,WL8,WL9,WL10)
+
+    
+    HP=MaxHP
+    setName("WoT HP System "+"["+owner():name()+"]")
+    Version="V1.0"
+}
+
+TrackRight=array(WR1,WR2,WR3,WR4,WR5,WR6,WR7,WR8,WR9,WR10)
+TrackLeft=array(WL1,WL2,WL3,WL4,WL5,WL6,WL7,WL8,WL9,WL10)
+
+if(TrackRight:count()!=TrackRightOriginal:count()){
+    TrackRightBroken=1
+}
+if(TrackLeft:count()!=TrackLeftOriginal:count()){
+    TrackLeftBroken=1
+}
+
+if(TrackRightBroken|TrackLeftBroken){
+    TracksBroken=1
+    TracksHP=0
+}
+
+HP=TracksHP
