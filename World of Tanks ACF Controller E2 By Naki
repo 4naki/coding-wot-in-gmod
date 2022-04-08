@@ -1,0 +1,29 @@
+@name WoT ACF Controller E2 By Naki
+@inputs [Seat Base]:entity
+@outputs Active
+@persist Active
+@persist Version:string
+@trigger none
+runOnChat(1)
+if(first()|dupefinished()){
+    
+    #[ -- ] Settings [ -- ]#
+    
+    
+    #[ -- ] Settings ends here [ -- ]#
+    
+    setName("WoT ACF Controller "+"["+owner():name()+"]")
+    Version="V1.0"
+}
+interval(100)
+
+if(changed(Seat:driver())){
+    Active=Seat:driver():isValid()
+}
+
+if(chatClk(owner())){
+    hideChat(owner():lastSaid():explode("")[1,string]==".")
+    if(owner():lastSaid()==".version"){
+        print("["+entity():getName()+"] Version: "+Version)
+    }
+}
