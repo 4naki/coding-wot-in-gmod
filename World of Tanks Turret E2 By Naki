@@ -55,6 +55,7 @@ if(first()|dupefinished()){
     holoPos(1,Base:pos())
     holoAng(1,Base:angles())
     holoParent(1,Base)
+    holoAlpha(1,0)
     PointHolo=holoEntity(1)
     
     setName("WoT Turret "+"["+owner():name()+"]")
