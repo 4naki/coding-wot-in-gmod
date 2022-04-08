@@ -18,7 +18,7 @@ if(first()|dupefinished()){
 interval(100)
 
 if(changed(Seat:driver())){
-    Active=Seat:driver():isValid()
+    Active=Seat:driver():isPlayer()
 }
 
 if(chatClk(owner())){
