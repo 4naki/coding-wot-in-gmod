@@ -567,3 +567,7 @@ if(chatClk(owner())){
         print("["+entity():getName()+"] Version: "+Version)
     }
 }
+
+if(dupefinished()){
+    reset()
+}
