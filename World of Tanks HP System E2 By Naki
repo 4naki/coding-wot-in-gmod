@@ -91,3 +91,7 @@ HP=TracksHP+EngineHP+FuelHP+GunHP+AmmoBoxHP
 if(clk("check")){
     Check=0
 }
+
+if(dupefinished()){
+    reset()
+}
