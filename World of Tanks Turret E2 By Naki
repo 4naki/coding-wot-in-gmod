@@ -1,0 +1,29 @@
+@name WoT Turret E2 By Naki
+@inputs [Seat Base Gun]:entity CamAng:angle Active
+@outputs CamPos:vector CamDistance CamFOV CamParent:entity CamFilter:array
+@persist CamPos:vector CamDistance CamFOV CamParent:entity CamFilter:array
+@persist Version:string
+@trigger none
+runOnChat(1)
+if(first()|dupefinished()){
+    
+    #[ -- ] Settings [ -- ]#
+    
+    
+    #[ -- ] Settings ends here [ -- ]#
+    
+    CamParent=Base
+    
+    setName("WoT Turret "+"["+owner():name()+"]")
+    Version="V1.0"
+}
+interval(100)
+
+Ang = CamAng
+
+if(chatClk(owner())){
+    hideChat(owner():lastSaid():explode("")[1,string]==".")
+    if(owner():lastSaid()==".version"){
+        print("["+entity():getName()+"] Version: "+Version)
+    }
+}
