@@ -1,26 +1,106 @@
 @name WoT Turret E2 By Naki
+@inputs PrevWeapon NextWeapon Hold
 @inputs [Seat Base Gun]:entity CamAng:angle Active
-@outputs CamPos:vector CamDistance CamFOV CamParent:entity CamFilter:array
-@persist CamPos:vector CamDistance CamFOV CamParent:entity CamFilter:array
+@outputs CamPos:vector CamDistance CamFOV CamParent:entity CamFilter:array FOV
+@persist CamPos:vector CamDistance CamFOV CamParent:entity CamFilter:array FOV
 @persist Version:string
-@trigger none
+@persist RotateSpeed Elevation Depression Rotation [Inertia]:angle PointHolo:entity
+#@trigger none
 runOnChat(1)
+
+if(~PrevWeapon){
+    timer("fovadd",100)
+}
+if(~NextWeapon){
+    timer("fovnegate",100)
+}
+if(clk("fovadd")){
+    FOV+=1
+}
+if(clk("fovnegate")){
+    FOV-=1
+}
+if(FOV>4){
+    FOV=4
+}
+if(FOV<0){
+    FOV=0
+}
+
+if(changed(FOV)){
+    CamFOV=array((90),(90/2),(90/4),(90/8),(90/16))[FOV+1,number]
+}
+if (~Active&Active|~Active&!Active) {
+    CamFOV=90
+}
+
 if(first()|dupefinished()){
     
     #[ -- ] Settings [ -- ]#
     
+    CamPos=vec(0,0,15)
+    CamDistance=100
+    
+    RotateSpeed=8
+    
+    Elevation=17
+    Depression=8.5
     
     #[ -- ] Settings ends here [ -- ]#
     
     CamParent=Base
+    Inertia=shiftL(ang(Gun:inertia()))
+    
+    holoCreate(1)
+    holoPos(1,Base:pos())
+    holoAng(1,Base:angles())
+    holoParent(1,Base)
+    PointHolo=holoEntity(1)
     
     setName("WoT Turret "+"["+owner():name()+"]")
     Version="V1.0"
+    interval(100)
+    
+    rangerFilter(Gun)
+    rangerFilter(entity():getConstraints())
+    rangerPersist(1)
+    
+    Gun:soundPlay(1,0,"vehicles/tank_turret_loop1.wav")
+    soundPitch(1,0)
+    interval( 35 )
+    stoptimer("stop-gun-spinning")
+}elseif( ~Active & !Active){
+    timer("stop-gun-spinning",100)
+}elseif(clk()){
+    if(Hold){
+        AimDir = PointHolo:forward()
+    }else{
+        if(Active){
+            holoAng(1,CamAng)
+        }
+        AimDir = PointHolo:forward()
+    }
+    if(changed(Active)&!Active){
+        holoAng(1,Base:toWorld(ang(0,0,0)))
+    }
+    
+    local Position = Base:toWorld(CamPos)
+    local Ranger = rangerOffset(9999999999,Position,AimDir)
+    local GunAng = (Ranger:pos() - Gun:pos()):toAngle()
+    local Force = Gun:toWorld(clamp(Gun:toLocal(GunAng),ang(-RotateSpeed),ang(RotateSpeed)))
+    local Clamped = clamp(entity():toLocal(Force),ang(-Elevation+Base:angles():pitch(),-180,-1),ang(Depression+Base:angles():pitch(),180,1))
+    local LocalToGun = Gun:toLocal(entity():toWorld(Clamped))
+    soundPitch(1,clamp(Gun:angVelVector():length()*10*(Gun:angVelVector():length()>10),0,80))
+    
+    Gun:applyAngForce((LocalToGun * 250 - Gun:angVel() * 47) * Inertia) #250, 47
+    
+    interval(35)
+}elseif(clk("stop-gun-spinning")){
+    Gun:applyAngForce(-Gun:angVel() * 30 * Inertia)
+    if(Gun:angVelVector():length()>0.1){
+        timer("stop-gun-spinning",100)
+    }
 }
-interval(100)
-
-Ang = CamAng
-
 if(chatClk(owner())){
     hideChat(owner():lastSaid():explode("")[1,string]==".")
     if(owner():lastSaid()==".version"){
