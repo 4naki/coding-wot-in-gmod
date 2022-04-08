@@ -4,7 +4,7 @@
 @persist W H TankInfoPanelW TankInfoPanelH HP MaxHP
 @persist AP HE Gold
 @persist Slot4 Slot5 Slot6
-@persist SpreadAddSpeed SpreadNegateSpeed SpreadBaseVal SpreadMaxVal SpreadAddSpeedTreshold Spread ZoomX:string
+@persist SpreadAddSpeed SpreadNegateSpeed SpreadBaseVal SpreadMaxVal SpreadAddSpeedTreshold Spread ZoomX:string Zoom
 @persist Version:string
 @outputs ZoomX:string
 @trigger none
@@ -31,9 +31,8 @@ if(first()|changed(Seat:driver())|dupefinished()){
     #[ -- ] Settings ends here [ -- ]#
     
     EGP:egpClear()
-    #Seat:driver()
-    W=egpScrW(owner())
-    H=egpScrH(owner())
+    W=egpScrW(Seat:driver())
+    H=egpScrH(Seat:driver())
     
     TankInfoPanelW=-845
     TankInfoPanelH=425
@@ -501,19 +500,24 @@ if(changed(Slot4)|first()){
 
 interval(100)
 
-#if(Active){
+if(Active){
     
     if(changed(FOV)){
         if(FOV==0){
             ZoomX=""
+            Zoom=0
         }elseif(FOV==1){
             ZoomX="x2"
+            Zoom=2
         }elseif(FOV==2){
             ZoomX="x4"
+            Zoom=4
         }elseif(FOV==3){
             ZoomX="x8"
+            Zoom=8
         }elseif(FOV==4){
             ZoomX="x16"
+            Zoom=16
         }
         if(FOV>0){
             local I = 63
@@ -537,13 +541,13 @@ interval(100)
     }elseif(Spread<0){
         Spread=0
     }
-    EGP:egpSize(2,vec2(clamp(SpreadBaseVal+((SpreadMaxVal-SpreadBaseVal)*(clamp(Spread,0,100)/100)),SpreadBaseVal,SpreadMaxVal)))
+    EGP:egpSize(2,vec2(clamp(SpreadBaseVal+((SpreadMaxVal-SpreadBaseVal)*(clamp(Spread,0,100)/100)),SpreadBaseVal,SpreadMaxVal)+Zoom))
     Gun_Ranger = rangerOffset( 100000 , Gun:toWorld(vec(150,0,0)) , Gun:forward() )
     holoPos(1,Gun_Ranger:position())
 
     Yaw = Gun:toLocal(Base:angles()):yaw()
     EGP:egpAngle(3,Yaw)
-#}
+}
 #[ -- ] Chat Commands [ -- ]#
 
 if(chatClk(owner())){
