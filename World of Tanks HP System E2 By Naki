@@ -1,37 +1,70 @@
 @name WoT HP System E2 By Naki
 @inputs [EngineEnt FuelEnt GunEnt AmmoBoxEnt]:entity
 @inputs [WR1 WR2 WR3 WR4 WR5 WR6 WR7 WR8 WR9 WR10 WL1 WL2 WL3 WL4 WL5 WL6 WL7 WL8 WL9 WL10]:entity
-@outputs HP MaxHP
-@persist HP MaxHP [TrackRightOriginal TrackLeftOriginal]:array TrackRightBroken TrackLeftBroken TracksBroken
-@persist TracksHP
+@outputs HP MaxHP TrackRightBroken TrackLeftBroken TracksBroken [TrackRightOriginal TrackLeftOriginal]:array [TrackRight TrackLeft]:array Check TrackRightCount TrackLeftCount
+@persist HP MaxHP [TrackRightOriginal TrackLeftOriginal]:array [TrackRight TrackLeft]:array TrackRightBroken TrackLeftBroken TracksBroken Check TrackRightCount TrackLeftCount
+@persist TracksHP EngineHP FuelHP GunHP AmmoBoxHP
 @trigger 
-
+interval(100)
 if(first()|dupefinished()){
     
     #[ -- ] Settings [ -- ]#
     
     MaxHP=1300
     
-    TracksHP=MaxHP/10
+    TracksHP=MaxHP/5
+    EngineHP=MaxHP/5
+    FuelHP=MaxHP/5
+    GunHP=MaxHP/5
+    AmmoBoxHP=MaxHP/5
     
     #[ -- ] Settings ends here [ -- ]#
     
     TrackRightOriginal=array(WR1,WR2,WR3,WR4,WR5,WR6,WR7,WR8,WR9,WR10)
     TrackLeftOriginal=array(WL1,WL2,WL3,WL4,WL5,WL6,WL7,WL8,WL9,WL10)
-
     
     HP=MaxHP
     setName("WoT HP System "+"["+owner():name()+"]")
     Version="V1.0"
+    timer("check",500)
+    Check=1
 }
-
-TrackRight=array(WR1,WR2,WR3,WR4,WR5,WR6,WR7,WR8,WR9,WR10)
-TrackLeft=array(WL1,WL2,WL3,WL4,WL5,WL6,WL7,WL8,WL9,WL10)
-
-if(TrackRight:count()!=TrackRightOriginal:count()){
+if(Check){
+    foreach(I,E:entity=TrackRightOriginal){
+        if(!E:isValid()){
+            TrackRightOriginal:remove(I)
+        }
+    }
+    foreach(I,E:entity=TrackLeftOriginal){
+        if(!E:isValid()){
+            TrackLeftOriginal:remove(I)
+        }
+    }
+    TrackRight=TrackRightOriginal
+    TrackLeft=TrackLeftOriginal
+    TrackRightCount=TrackRightOriginal:count()
+    TrackLeftCount=TrackLeftOriginal:count()
+}else{
+    if(TrackRightCount==0){
+        TrackRightBroken=1
+    }
+    if(TrackLeftCount==0){
+        TrackLeftBroken=1
+    }
+foreach(I,E:entity=TrackRight){
+    if(!E:isValid()){
+        TrackRight:remove(I)
+    }
+}
+foreach(I,E:entity=TrackLeft){
+    if(!E:isValid()){
+        TrackLeft:remove(I)
+    }
+}
+if(TrackRight:count()!=TrackRightCount){
     TrackRightBroken=1
 }
-if(TrackLeft:count()!=TrackLeftOriginal:count()){
+if(TrackLeft:count()!=TrackLeftCount){
     TrackLeftBroken=1
 }
 
@@ -40,4 +73,21 @@ if(TrackRightBroken|TrackLeftBroken){
     TracksHP=0
 }
 
-HP=TracksHP
+if(EngineEnt==noentity()){
+    EngineHP=0
+}
+if(FuelEnt==noentity()){
+    FuelHP=0
+}
+if(GunEnt==noentity()){
+    GunHP=0
+}
+if(AmmoBoxEnt==noentity()){
+    AmmoBoxHP=0
+}
+
+HP=TracksHP+EngineHP+FuelHP+GunHP+AmmoBoxHP
+}
+if(clk("check")){
+    Check=0
+}
