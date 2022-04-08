@@ -1,14 +1,15 @@
 @name WoT Hud By Naki
 @inputs AP HE Gold Slot4 Slot5 Slot6 HP
-@inputs [Seat Base Gun]:entity EGP:wirelink Active
+@inputs [Seat Base Gun]:entity EGP:wirelink Active FOV
 @persist W H TankInfoPanelW TankInfoPanelH HP MaxHP
 @persist AP HE Gold
 @persist Slot4 Slot5 Slot6
-@persist SpreadAddSpeed SpreadNegateSpeed SpreadBaseVal SpreadMaxVal SpreadAddSpeedTreshold Spread
+@persist SpreadAddSpeed SpreadNegateSpeed SpreadBaseVal SpreadMaxVal SpreadAddSpeedTreshold Spread ZoomX:string
 @persist Version:string
+@outputs ZoomX:string
 @trigger none
 runOnChat(1)
-if(first()|dupefinished()){
+if(first()|changed(Seat:driver())|dupefinished()){
     
     #[ -- ] Settings [ -- ]#
     
@@ -18,10 +19,10 @@ if(first()|dupefinished()){
     SpreadBaseVal=16
     SpreadMaxVal=150
     
-    SpreadAddSpeed=0.5
-    SpreadNegateSpeed=1.2
+    SpreadAddSpeed=1
+    SpreadNegateSpeed=2
     
-    SpreadAddSpeedTreshold=8
+    SpreadAddSpeedTreshold=0
     
     MaxHP=1300
     HPOffset=0
@@ -30,7 +31,7 @@ if(first()|dupefinished()){
     #[ -- ] Settings ends here [ -- ]#
     
     EGP:egpClear()
-    
+    #Seat:driver()
     W=egpScrW(owner())
     H=egpScrH(owner())
     
@@ -407,13 +408,13 @@ if(first()|dupefinished()){
     
     local I = 60
     local P = vec2(0+W/2,0+H/2)
-    EGP:egpLine(I,vec2(55,0)+P,vec2(15,0)+P)
+    EGP:egpLine(I,vec2(32,0)+P,vec2(10,0)+P)
     EGP:egpColor(I,vec(25))
     EGP:egpSize(I,1)
     
     local I = 61
     local P = vec2(0+W/2,0+H/2)
-    EGP:egpLine(I,vec2(-55,0)+P,vec2(-15,0)+P)
+    EGP:egpLine(I,vec2(-32,0)+P,vec2(-10,0)+P)
     EGP:egpColor(I,vec(25))
     EGP:egpSize(I,1)
     
@@ -429,7 +430,7 @@ if(changed(HP)){
     EGP:egpColor(I,vec(255*(MaxHP-HP), 255*(HP/MaxHP), 0)*0.45)
 }
 
-if(changed(AP)){
+if(changed(AP)|first()){
     EGP:egpSetText(48,AP:toString())
     if(AP==0){
         EGP:egpColor(33,vec(175,0,0))
@@ -441,7 +442,7 @@ if(changed(AP)){
     }
 }
 
-if(changed(HE)){
+if(changed(HE)|first()){
     EGP:egpSetText(47,HE:toString())
     if(HE==0){
         EGP:egpColor(32,vec(175,0,0))
@@ -453,7 +454,7 @@ if(changed(HE)){
     }
 }
 
-if(changed(Gold)){
+if(changed(Gold)|first()){
     EGP:egpSetText(46,Gold:toString())
     if(Gold==0){
         EGP:egpColor(31,vec(175,0,0))
@@ -465,7 +466,7 @@ if(changed(Gold)){
     }
 }
 
-if(changed(Slot6)){
+if(changed(Slot6)|first()){
     if(Slot6==0){
         EGP:egpColor(39,vec(175,0,0))
         EGP:egpAlpha(51,0)
@@ -476,7 +477,7 @@ if(changed(Slot6)){
     }
 }
 
-if(changed(Slot5)){
+if(changed(Slot5)|first()){
     if(Slot5==0){
         EGP:egpColor(38,vec(175,0,0))
         EGP:egpAlpha(50,0)
@@ -487,7 +488,7 @@ if(changed(Slot5)){
     }
 }
 
-if(changed(Slot4)){
+if(changed(Slot4)|first()){
     if(Slot4==0){
         EGP:egpColor(37,vec(175,0,0))
         EGP:egpAlpha(49,0)
@@ -500,7 +501,31 @@ if(changed(Slot4)){
 
 interval(100)
 
-if(Active){
+#if(Active){
+    
+    if(changed(FOV)){
+        if(FOV==0){
+            ZoomX=""
+        }elseif(FOV==1){
+            ZoomX="x2"
+        }elseif(FOV==2){
+            ZoomX="x4"
+        }elseif(FOV==3){
+            ZoomX="x8"
+        }elseif(FOV==4){
+            ZoomX="x16"
+        }
+        if(FOV>0){
+            local I = 63
+            EGP:egpText(I,ZoomX,vec2(109+W/2,22+H/2))
+            EGP:egpFont(I,"Consolas")
+            EGP:egpColor(I,vec(240))
+            EGP:egpSize(I,19)
+        }else{
+            EGP:egpRemove(63)
+        }
+    }
+    
     if(Spread<100){
         Add=clamp(((abs(Gun:angVel():pitch())+abs(Gun:angVel():yaw())+abs(Gun:angVel():roll()))/3),0,100)*SpreadAddSpeed
         Spread+=Add*(Add>SpreadAddSpeedTreshold/10)
@@ -518,7 +543,7 @@ if(Active){
 
     Yaw = Gun:toLocal(Base:angles()):yaw()
     EGP:egpAngle(3,Yaw)
-}
+#}
 #[ -- ] Chat Commands [ -- ]#
 
 if(chatClk(owner())){
