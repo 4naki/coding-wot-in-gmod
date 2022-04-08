@@ -1,7 +1,7 @@
 @name WoT Hud By Naki
-@inputs AP HE Gold Slot4 Slot5 Slot6 HP
+@inputs AP HE Gold Slot4 Slot5 Slot6 HP MaxHP
 @inputs [Seat Base Gun]:entity EGP:wirelink Active FOV
-@persist W H TankInfoPanelW TankInfoPanelH HP MaxHP
+@persist W H TankInfoPanelW TankInfoPanelH
 @persist AP HE Gold
 @persist Slot4 Slot5 Slot6
 @persist SpreadAddSpeed SpreadNegateSpeed SpreadBaseVal SpreadMaxVal SpreadAddSpeedTreshold Spread ZoomX:string Zoom
@@ -24,15 +24,15 @@ if(first()|changed(Seat:driver())|dupefinished()){
     
     SpreadAddSpeedTreshold=0
     
-    MaxHP=1300
     HPOffset=0
     
     
     #[ -- ] Settings ends here [ -- ]#
     
     EGP:egpClear()
-    W=egpScrW(Seat:driver())
-    H=egpScrH(Seat:driver())
+    Ent=Seat:driver()
+    W=egpScrW(Ent)
+    H=egpScrH(Ent)
     
     TankInfoPanelW=-845
     TankInfoPanelH=425
@@ -426,7 +426,7 @@ if(changed(HP)){
     EGP:egpSetText(12,HP+"/"+MaxHP)
     local I = 10
     EGP:egpLine(I,vec2(TankInfoPanelW-107+W/2,TankInfoPanelH-85+H/2),vec2(TankInfoPanelW+(-107+(107*((HP/MaxHP)*2)))+W/2,TankInfoPanelH-85+H/2))
-    EGP:egpColor(I,vec(255*(MaxHP-HP), 255*(HP/MaxHP), 0)*0.45)
+    EGP:egpColor(I,vec(255*(1-(HP/MaxHP)), 255*(HP/MaxHP), 0)*0.45)
 }
 
 if(changed(AP)|first()){
