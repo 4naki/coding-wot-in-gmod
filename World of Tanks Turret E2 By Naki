@@ -82,6 +82,7 @@ if(first()|dupefinished()){
         AimDir = PointHolo:forward()
     }
     if(changed(Active)&!Active){
+        FOV=0
         holoAng(1,Base:toWorld(ang(0,0,0)))
     }
     
